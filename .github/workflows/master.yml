@@ -22,20 +22,20 @@ jobs:
       uses: gradle/gradle-build-action@v2.10.0
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-             - name: Run Coverage
-             run: |
-               chmod +x gradlew
-               ./gradlew testCoverage
-
-               - name: Add coverage to PR
-                 id: jacoco
-                 uses: madrapps/jacoco-report@v1.6.1
-                 with:
-                   paths: |
-                     ${{ github.workspace }}/**/build/reports/jacoco/prodNormalDebugCoverage/prodNormalDebugCoverage.xml,
-                     ${{ github.workspace }}/**/build/reports/jacoco/**/debugCoverage.xml
-                   token: ${{ secrets.GITHUB_TOKEN }}
-                   min-coverage-overall: 40
-                   min-coverage-changed-files: 60
+    - name: Run Coverage
+      run: |
+       chmod +x gradlew
+       ./gradlew testCoverage
+  
+       - name: Add coverage to PR
+         id: jacoco
+         uses: madrapps/jacoco-report@v1.6.1
+         with:
+           paths: |
+             ${{ github.workspace }}/**/build/reports/jacoco/prodNormalDebugCoverage/prodNormalDebugCoverage.xml,
+             ${{ github.workspace }}/**/build/reports/jacoco/**/debugCoverage.xml
+           token: ${{ secrets.GITHUB_TOKEN }}
+           min-coverage-overall: 40
+           min-coverage-changed-files: 60
     - name: Build with Gradle
       run: ./gradlew build
