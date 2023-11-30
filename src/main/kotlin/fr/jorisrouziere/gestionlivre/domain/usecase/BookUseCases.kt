@@ -12,6 +12,10 @@ class BookUseCases(private val bddPort: BDDPort) {
         bddPort.addBook(book)
     }
 
+    fun addBook(book: Book) {
+        bddPort.addBook(book)
+    }
+
     fun listBooks(): List<Book> {
         return bddPort.listBooks()
     }
