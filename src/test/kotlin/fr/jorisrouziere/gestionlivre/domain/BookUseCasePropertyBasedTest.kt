@@ -2,6 +2,8 @@ package fr.jorisrouziere.gestionlivre.domain
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsAll
+import assertk.assertions.isTrue
 import fr.jorisrouziere.gestionlivre.domain.model.Book
 import fr.jorisrouziere.gestionlivre.domain.port.BDDPort
 import fr.jorisrouziere.gestionlivre.domain.usecase.BookUseCases
@@ -37,7 +39,7 @@ class BookUseCasePropertyBasedTest {
         assertThat(result).contains(arbitraryBook)
     }
 
-    /*@Property
+    @Property
     fun `La liste des livres retournés contient tous les éléments de la liste stockée`(
             @ForAll("books") arbitraryBooks: List<Book>
     ) {
@@ -51,8 +53,8 @@ class BookUseCasePropertyBasedTest {
         val result = bookUseCases.listBooks()
 
         // Assert
-        assertThat(result).containsAll(arbitraryBooks)
-    }*/
+        assertThat(result.containsAll(arbitraryBooks)).isTrue()
+    }
 
     @Provide
     fun book(): Arbitrary<Book> {
@@ -68,8 +70,9 @@ class BookUseCasePropertyBasedTest {
     @Provide
     fun books(): Arbitrary<List<Book>> {
 
-        return book().list()
+        val books = book().list()
                 .ofSize(10)
                 .uniqueElements { b -> b.title }
+        return books
     }
 }
