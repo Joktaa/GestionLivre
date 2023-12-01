@@ -6,6 +6,7 @@ plugins {
 	kotlin("jvm") version "1.9.20"
 	kotlin("plugin.spring") version "1.9.20"
 	jacoco
+	id("info.solidsoft.pitest") version "1.15.0"
 }
 
 group = "fr.jorisrouziere"
@@ -41,7 +42,9 @@ tasks.withType<Test> {
 
 tasks.test {
 	finalizedBy(tasks.jacocoTestReport)
+	finalizedBy(tasks.pitest)
 }
+
 tasks.jacocoTestReport {
 	dependsOn(tasks.test)
 	reports {
@@ -49,11 +52,10 @@ tasks.jacocoTestReport {
 	}
 }
 
-
-
 jacoco {
 	toolVersion = "0.8.11"
 }
 
-
-
+pitest {
+	junit5PluginVersion = "1.2.1"
+}
