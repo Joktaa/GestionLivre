@@ -29,7 +29,7 @@ jobs:
       if: always()
       with:
         files: |
-          test-results/test/*.xml
+          build/test-results/test/*.xml
     - name: JaCoCo Code Coverage Report
       id: jacoco_reporter
       uses: PavanMudigonda/jacoco-reporter@v4.9
