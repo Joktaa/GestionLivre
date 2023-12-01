@@ -50,7 +50,6 @@ tasks.jacocoTestReport {
 
 jacoco {
 	toolVersion = "0.8.11"
-	reportsDirectory = layout.buildDirectory.dir("jacocoReports")
 }
 
 
