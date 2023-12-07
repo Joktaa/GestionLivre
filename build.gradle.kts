@@ -12,6 +12,17 @@ plugins {
 group = "fr.jorisrouziere"
 version = "0.0.1-SNAPSHOT"
 
+sourceSets {
+	create("testIntegration") {
+		compileClasspath += sourceSets.main.get().output
+		runtimeClasspath += sourceSets.main.get().output
+	}
+}
+
+val testIntegrationImplementation: Configuration by configurations.getting {
+	extendsFrom(configurations.testImplementation.get())
+}
+
 java {
 	sourceCompatibility = JavaVersion.VERSION_21
 }
@@ -21,12 +32,43 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-jdbc")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("org.liquibase:liquibase-core:4.25.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("com.willowtreeapps.assertk:assertk:0.27.0")
 	testImplementation("net.jqwik:jqwik:1.8.2")
 	testImplementation("io.mockk:mockk:1.13.8")
+	testImplementation("org.postgresql:postgresql:42.7.0")
+	testImplementation("com.ninja-squad:springmockk:4.0.2")
+
+	testImplementation("org.testcontainers:postgresql:1.19.3")
+	testImplementation("org.testcontainers:junit-jupiter:1.19.3")
+	testImplementation("org.testcontainers:testcontainers:1.19.3")
+
+
+
+	testIntegrationImplementation("org.springframework.boot:spring-boot-starter-web")
+	testIntegrationImplementation("org.springframework.boot:spring-boot-starter-jdbc")
+	testIntegrationImplementation("org.jetbrains.kotlin:kotlin-reflect")
+	testIntegrationImplementation("org.liquibase:liquibase-core:4.25.0")
+	testIntegrationImplementation("org.springframework.boot:spring-boot-starter-test")
+	testIntegrationImplementation("com.willowtreeapps.assertk:assertk:0.27.0")
+	testIntegrationImplementation("net.jqwik:jqwik:1.8.2")
+	testIntegrationImplementation("io.mockk:mockk:1.13.8")
+	testIntegrationImplementation("org.postgresql:postgresql:42.7.0")
+	testIntegrationImplementation("com.ninja-squad:springmockk:4.0.2")
+
+	testIntegrationImplementation("org.testcontainers:postgresql:1.19.3")
+	testIntegrationImplementation("org.testcontainers:junit-jupiter:1.19.3")
+	testIntegrationImplementation("org.testcontainers:testcontainers:1.19.3")
+}
+
+task<Test>("testIntegration") {
+	useJUnitPlatform()
+	testClassesDirs = sourceSets["testIntegration"].output.classesDirs
+	classpath = sourceSets["testIntegration"].runtimeClasspath
 }
 
 tasks.withType<KotlinCompile> {

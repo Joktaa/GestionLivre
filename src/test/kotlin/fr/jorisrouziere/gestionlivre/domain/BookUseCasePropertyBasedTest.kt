@@ -2,7 +2,6 @@ package fr.jorisrouziere.gestionlivre.domain
 
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.containsAll
 import assertk.assertions.isTrue
 import fr.jorisrouziere.gestionlivre.domain.model.Book
 import fr.jorisrouziere.gestionlivre.domain.port.BDDPort
