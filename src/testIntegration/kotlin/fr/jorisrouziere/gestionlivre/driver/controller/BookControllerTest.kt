@@ -20,7 +20,8 @@ class BookControllerTest {
     @MockkBean
     private lateinit var bookUseCases: BookUseCases
 
-    @Autowired lateinit var mockMvc: MockMvc
+    @Autowired
+    private lateinit var mockMvc: MockMvc
 
     @Test
     fun `Un get sur books est ok`() {
