@@ -1,5 +1,7 @@
 package fr.jorisrouziere.gestionlivre
 
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import io.cucumber.java.Before
 import io.cucumber.java.Scenario
 import io.cucumber.spring.CucumberContextConfiguration
@@ -43,5 +45,18 @@ class CucumberRunnerTest {
     fun setup(scenario: Scenario) {
         RestAssured.baseURI = "http://localhost:$port"
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
+        performQuery("DELETE FROM book")
+    }
+
+    protected fun performQuery(sql: String) {
+        val hikariConfig = HikariConfig()
+        hikariConfig.setJdbcUrl(postgreSQLContainer.jdbcUrl)
+        hikariConfig.username = postgreSQLContainer.username
+        hikariConfig.password = postgreSQLContainer.password
+        hikariConfig.setDriverClassName(postgreSQLContainer.driverClassName)
+        val ds = HikariDataSource(hikariConfig)
+
+        val statement = ds.getConnection().createStatement()
+        statement.execute(sql)
     }
 }

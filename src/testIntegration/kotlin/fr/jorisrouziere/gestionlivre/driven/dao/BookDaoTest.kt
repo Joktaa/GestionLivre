@@ -1,5 +1,7 @@
 package fr.jorisrouziere.gestionlivre.driven.dao
 
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import fr.jorisrouziere.gestionlivre.domain.model.Book
 import fr.jorisrouziere.gestionlivre.infrastructure.driven.dao.BookDAO
 import org.junit.jupiter.api.*
@@ -47,8 +49,19 @@ class BookDaoTest {
 
         @BeforeEach
         fun cleanUp() {
-            postgreSQLContainer.execInContainer("psql", "-U", "postgres", "-c", "DROP DATABASE IF EXISTS gestion_livre")
-            postgreSQLContainer.execInContainer("psql", "-U", "postgres", "-c", "CREATE DATABASE gestion_livre")
+            performQuery("DELETE FROM book")
+        }
+
+        protected fun performQuery(sql: String) {
+            val hikariConfig = HikariConfig()
+            hikariConfig.setJdbcUrl(postgreSQLContainer.jdbcUrl)
+            hikariConfig.username = postgreSQLContainer.username
+            hikariConfig.password = postgreSQLContainer.password
+            hikariConfig.setDriverClassName(postgreSQLContainer.driverClassName)
+            val ds = HikariDataSource(hikariConfig)
+
+            val statement = ds.getConnection().createStatement()
+            statement.execute(sql)
         }
     }
 
@@ -62,20 +75,37 @@ class BookDaoTest {
         val books = bookDao.listBooks()
 
         // Assert
-        Assertions.assertTrue(books.any { it.title == book.title && it.author == book.author })
+        Assertions.assertTrue(books.any { it.title == book.title && it.author == book.author && !it.reserved })
     }
 
     @Test
-    fun `Ajout d'un autre livre`() {
+    fun `Liste des livres`() {
         // Arrange
-        val book = Book("La Légende des siècles", "Victor Hugo")
+        val book1 = Book("La légende des siècles", "Victor Hugo")
+        val book2 = Book("Le meilleur des mondes", "Aldous Huxley")
 
         // Act
-        bookDao.addBook(book)
+        bookDao.addBook(book1)
+        bookDao.addBook(book2)
         val books = bookDao.listBooks()
 
         // Assert
-        Assertions.assertTrue(books.any { it.title == book.title && it.author == book.author })
+        Assertions.assertTrue(books.any { it.title == book1.title && it.author == book1.author })
+        Assertions.assertTrue(books.any { it.title == book2.title && it.author == book2.author })
+    }
+
+    @Test
+    fun `Réservation d'un livre`() {
+        // Arrange
+        val book = Book("Les travailleurs de la mer", "Victor Hugo")
+        bookDao.addBook(book)
+
+        // Act
+        bookDao.reserveBook(book)
+        val books = bookDao.listBooks()
+
+        // Assert
+        Assertions.assertTrue(books.any { it.title == book.title && it.author == book.author && it.reserved })
     }
 
 }

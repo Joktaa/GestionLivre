@@ -2,6 +2,8 @@ package fr.jorisrouziere.gestionlivre.domain
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import fr.jorisrouziere.gestionlivre.domain.exceptions.BookAlreadyReservedException
+import fr.jorisrouziere.gestionlivre.domain.exceptions.BookNotFoundException
 import fr.jorisrouziere.gestionlivre.domain.model.Book
 import fr.jorisrouziere.gestionlivre.domain.port.BDDPort
 import fr.jorisrouziere.gestionlivre.domain.usecase.BookUseCases
@@ -28,6 +30,13 @@ class BookUseCasesUnitTest {
         books.clear()
         every { mock.addBook(any()) } answers { books.add(firstArg()) }
         every { mock.listBooks() } answers { books.sortedBy { it.title } }
+        every { mock.reserveBook(any()) } answers {
+            books.forEach { b ->
+                if (b.title == firstArg<Book>().title && b.author == firstArg<Book>().author) {
+                    b.reserved = true
+                }
+            }
+        }
         bookUseCases = BookUseCases(mock)
     }
 
@@ -69,5 +78,49 @@ class BookUseCasesUnitTest {
         assertThat(retournedBooks[0].title).isEqualTo("Le Hobbit")
         assertThat(retournedBooks[1].title).isEqualTo("Le Seigneur des Anneaux")
         assertThat(retournedBooks[2].title).isEqualTo("Le Silmarillion")
+    }
+
+    @Test
+    fun `reserveBook réserve un livre`() {
+        // Arrange
+        bookUseCases.addBook("La légende des siècles", "Victor Hugo")
+
+        // Act
+        bookUseCases.reserveBook("La légende des siècles", "Victor Hugo")
+
+        // Assert
+        val lastBook = books.last()
+        assertThat(lastBook.reserved).isEqualTo(true)
+    }
+
+    @Test
+    fun `un livre créé est non réservé`() {
+        // Arrange
+        bookUseCases.addBook("La légende des siècles", "Victor Hugo")
+
+        // Assert
+        val lastBook = books.last()
+        assertThat(lastBook.reserved).isEqualTo(false)
+    }
+
+    @Test
+    fun `reserveBook lève une exception quand le livre n'existe pas`() {
+        // Assert
+        // Act & Assert
+        assertThrows<BookNotFoundException> {
+            bookUseCases.reserveBook("La légende des siècles", "Victor Hugo")
+        }
+    }
+
+    @Test
+    fun `reserveBook lève une exception quand le livre est déjà réservé`() {
+        // Arrange
+        bookUseCases.addBook("La légende des siècles", "Victor Hugo")
+        bookUseCases.reserveBook("La légende des siècles", "Victor Hugo")
+
+        // Act & Assert
+        assertThrows<BookAlreadyReservedException> {
+            bookUseCases.reserveBook("La légende des siècles", "Victor Hugo")
+        }
     }
 }

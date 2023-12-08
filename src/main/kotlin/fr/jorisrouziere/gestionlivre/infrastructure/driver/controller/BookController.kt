@@ -27,4 +27,11 @@ class BookController {
     ) {
         bookUseCase.addBook(book.title, book.author)
     }
+
+    @PostMapping("/reserve")
+    fun reserveBook(
+            @RequestBody book: BookDTO
+    ) {
+        bookUseCase.reserveBook(book.title, book.author)
+    }
 }
