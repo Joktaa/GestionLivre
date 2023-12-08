@@ -22,6 +22,10 @@ sourceSets {
 		compileClasspath += sourceSets.main.get().output
 		runtimeClasspath += sourceSets.main.get().output
 	}
+	create("testArchitecture") {
+		compileClasspath += sourceSets.main.get().output
+		runtimeClasspath += sourceSets.main.get().output
+	}
 }
 
 val testIntegrationImplementation: Configuration by configurations.getting {
@@ -29,6 +33,10 @@ val testIntegrationImplementation: Configuration by configurations.getting {
 }
 
 val testComponentImplementation: Configuration by configurations.getting {
+	extendsFrom(configurations.testImplementation.get())
+}
+
+val testArchitectureImplementation: Configuration by configurations.getting {
 	extendsFrom(configurations.testImplementation.get())
 }
 
@@ -112,6 +120,11 @@ dependencies {
 	testComponentImplementation("io.cucumber:cucumber-junit-platform-engine:7.14.1")
 
 	testComponentImplementation("io.rest-assured:rest-assured:5.3.2")
+
+
+
+	testArchitectureImplementation("com.tngtech.archunit:archunit-junit5:1.2.1")
+
 }
 
 task<Test>("testIntegration") {
@@ -121,6 +134,12 @@ task<Test>("testIntegration") {
 }
 
 task<Test>("testComponent") {
+	useJUnitPlatform()
+	testClassesDirs = sourceSets["testComponent"].output.classesDirs
+	classpath = sourceSets["testComponent"].runtimeClasspath
+}
+
+task<Test>("testArchitecture") {
 	useJUnitPlatform()
 	testClassesDirs = sourceSets["testComponent"].output.classesDirs
 	classpath = sourceSets["testComponent"].runtimeClasspath
